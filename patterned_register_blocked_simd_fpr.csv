@@ -1,0 +1,10 @@
+Filter, NumValues, FPR
+patterned_register_blocked_simd, 1024, 0.0605469
+patterned_register_blocked_simd, 4096, 0.0595703
+patterned_register_blocked_simd, 16384, 0.0734863
+patterned_register_blocked_simd, 65536, 0.0608673
+patterned_register_blocked_simd, 262144, 0.0624962
+patterned_register_blocked_simd, 1048576, 0.0611162
+patterned_register_blocked_simd, 4194304, 0.0614727
+patterned_register_blocked_simd, 16777216, 0.0614355
+patterned_register_blocked_simd, 67108864, 0.0689829
