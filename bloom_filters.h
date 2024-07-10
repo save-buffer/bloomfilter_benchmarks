@@ -115,7 +115,7 @@ struct BlockedBloomFilter
             uint32_t bit_pos = (h1 + i * h2) % CACHE_LINE_BITS;
             uint64_t bit_idx = bit_pos % 8;
             uint64_t byte_idx = bit_pos / 8;
-            result &= (bv[byte_idx] >> bit_idx) & 1;
+            result &= (block[byte_idx] >> bit_idx) & 1;
         }
         return result;
     }
@@ -206,7 +206,7 @@ struct SimdBloomFilter
     {
         m = ComputeNumBits();
         k = ComputeNumHashFns();
-        int log_num_blocks = 64 - __builtin_clz(m) - 6;
+        int log_num_blocks = 32 - __builtin_clz(m) - 6;
         num_blocks = (1 << log_num_blocks);
         bv.resize(num_blocks);
     }
@@ -394,8 +394,8 @@ struct PatternedSimdBloomFilter
     PatternedSimdBloomFilter(int n, float eps) : n(n), epsilon(eps)
     {
         m = ComputeNumBits();
-        int log_num_blocks = 64 - __builtin_clz(m) - 6;
-        num_blocks = (1 << log_num_blocks);
+        int log_num_blocks = 32 - __builtin_clz(m) - rotate_bits;
+        num_blocks = (1ULL << log_num_blocks);
         bv.resize(num_blocks);
     }
 
@@ -419,7 +419,7 @@ struct PatternedSimdBloomFilter
         __m256i vecMaskMask = _mm256_set1_epi64x((1ull << MaskTable::bits_per_mask) - 1);
         __m256i vec64 = _mm256_set1_epi64x(64);
 
-        __m256i vecMaskIdx = _mm256_and_si256(vecHash, vecMaskIdx);
+        __m256i vecMaskIdx = _mm256_and_si256(vecHash, vecMaskIdxMask);
         __m256i vecMaskByteIdx = _mm256_srli_epi64(vecMaskIdx, 3);
         __m256i vecMaskBitIdx = _mm256_and_si256(vecMaskIdx, _mm256_set1_epi64x(0x7));
         __m256i vecRawMasks = _mm256_i64gather_epi64((const long long *)masks.masks, vecMaskByteIdx, 1);
